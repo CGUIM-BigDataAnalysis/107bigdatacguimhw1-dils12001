@@ -17,20 +17,20 @@ aaa104 <- read_csv("C:/Users/User/Desktop/bigdata/104aaa.csv")
 aaa105 <- read_csv("C:/Users/User/Desktop/bigdata/105aaa.csv")
 aaa106 <- read_csv("C:/Users/User/Desktop/bigdata/106aaa.csv")
 
-aaa103<-aaa103[,c(-1,-5,-6,-7,-8,-9,-10)]#刪除不要的欄位
-aaa104<-aaa104[,c(-1,-5,-6,-7,-8,-9,-10)]
-aaa105<-aaa105[,c(-1,-5,-6,-7,-8,-9,-10)]
-aaa106<-aaa106[,c(-1,-5,-6,-7,-8,-9,-10)]
-for(i in c(1:7)){#把第1到7欄位的vector分別取出來
+aaa103<-aaa103[,c(-3,-4,-5,-6,-7,-8,-9,-10)]#刪除不要欄位
+aaa104<-aaa104[,c(-3,-4,-5,-6,-7,-8,-9,-10)]
+aaa105<-aaa105[,c(-3,-4,-5,-6,-7,-8,-9,-10)]
+aaa106<-aaa106[,c(-3,-4,-5,-6,-7,-8,-9,-10)]
+for(i in c(1:6)){#把第1到7欄位的vector分別取出來
   aaa103[[i]]<-gsub("—|…|、|_","",aaa103[[i]])#把—和…取代成空字串
 }
-for(i in c(1:7)){
+for(i in c(1:6)){
   aaa104[[i]]<-gsub("—|…|、|_","",aaa104[[i]])
 }
-for(i in c(1:7)){
+for(i in c(1:6)){
   aaa105[[i]]<-gsub("—|…|、|_","",aaa105[[i]])
 }
-for(i in c(1:7)){
+for(i in c(1:6)){
   aaa106[[i]]<-gsub("—|…|、|_","",aaa106[[i]])
 }
 ```
@@ -44,8 +44,10 @@ a103106<-arrange(a103106,desc(兩年度薪資比例))#照大到小排序
 b103106<-a103106[a103106$兩年度薪資比例>1,]#106年比103年大的
 b103106<-na.omit(b103106)#刪除空紀錄
 b103106$大職業別#職業名稱
-head(b103106$大職業別,10)#職業名稱(前10個)
+head(b103106$大職業別,10)  #職業名稱(前10個) 
 ```
+####感覺服務業普遍薪資提高很多
+
 
 ### 提高超過5%的的職業有哪些? 
 ```{r over5}
@@ -56,12 +58,11 @@ c103106$大職業別
 
 ### 主要的職業種別是哪些種類呢?
 ```{r mainType}
-career<-c(1)
+career<-c()
 for(i in c(1:nrow(c103106))){
   career<-c(career,strsplit(c103106$大職業別,"-")[[i]][1])
 }
-career<-career[-1]
-table(career)
+knitr::kable(table(career))
 ```
 
 ## 男女同工不同酬現況分析
@@ -74,26 +75,31 @@ aaa103$`大學-女/男`<-as.numeric(aaa103$`大學-女/男`)#轉成數字型態
 aaa103<-na.omit(aaa103)#刪除空紀錄
 ratio103<-aaa103[aaa103$`大學-女/男`<100,]#大學-女/男=98 代表 女:男=98:100,男生薪資大於女生2
 ratio103<-arrange(ratio103,`大學-女/男`)#照小到大排列,愈小表男生薪資比女生薪資大愈多
-head(ratio103$大職業別,10)#列出前10個
 
 aaa104$`大學-女/男`<-as.numeric(aaa104$`大學-女/男`)
 aaa104<-na.omit(aaa104)
 ratio104<-aaa104[aaa104$`大學-女/男`<100,]
 ratio104<-arrange(ratio104,`大學-女/男`)
-head(ratio104$大職業別,10)
 
 aaa105$`大學-女/男`<-as.numeric(aaa105$`大學-女/男`)
 aaa105<-na.omit(aaa105)
 ratio105<-aaa103[aaa105$`大學-女/男`<100,]
 ratio105<-arrange(ratio105,`大學-女/男`)
-head(ratio105$大職業別,10)
 
 aaa106$`大學-女/男`<-as.numeric(aaa106$`大學-女/男`)
 aaa106<-na.omit(aaa106)
 ratio106<-aaa106[aaa106$`大學-女/男`<100,]
 ratio106<-arrange(ratio106,`大學-女/男`)
-head(ratio106$大職業別,10)
+
+compare<-rbind(ratio103,ratio104,ratio105,ratio106)
+knitr::kable(compare)
+knitr::kable(data.frame("top10_103年"=head(ratio103$大職業別,10),
+                        "top10_104年"=head(ratio104$大職業別,10),
+                        "top10_105年"=head(ratio105$大職業別,10),
+                        "top10_106年"=head(ratio106$大職業別,10)))
 ```
+
+
 ### 哪些行業女生薪資比男生薪資多? 
 ```{r female}
 ccc103<-aaa103
@@ -101,29 +107,33 @@ ccc103$`大學-女/男`<-as.numeric(ccc103$`大學-女/男`)#轉成數字型態
 ccc103<-na.omit(ccc103)#刪除空紀錄
 ratio103b<-ccc103[ccc103$`大學-女/男`>100,]#大學-女/男=101 代表 女:男=101:100,女生薪資大於男生1
 ratio103b<-arrange(ratio103b,desc(`大學-女/男`))#照大到小排列,愈大表女生薪資比男生薪資大愈多
-head(ratio103b$大職業別,10)#列出前10個
+
 
 ccc104<-aaa104
 ccc104$`大學-女/男`<-as.numeric(ccc104$`大學-女/男`)
 ccc104<-na.omit(ccc104)
 ratio104b<-ccc104[ccc104$`大學-女/男`>100,]
 ratio104b<-arrange(ratio104b,desc(`大學-女/男`))
-head(ratio104b$大職業別,10)
+
 
 ccc105<-aaa105
 ccc105$`大學-女/男`<-as.numeric(ccc105$`大學-女/男`)
 ccc105<-na.omit(ccc105)
 ratio105b<-ccc105[ccc105$`大學-女/男`>100,]
 ratio105b<-arrange(ratio105b,desc(`大學-女/男`))
-head(ratio105b$大職業別,10)
+
 
 ccc106<-aaa106
 ccc106$`大學-女/男`<-as.numeric(ccc106$`大學-女/男`)
 ccc106<-na.omit(ccc106)
 ratio106b<-ccc106[ccc106$`大學-女/男`>100,]
 ratio106b<-arrange(ratio106b,desc(`大學-女/男`))
-head(ratio106b$大職業別,10)
+
+compare1<-rbind(c(2014,"","","","",""),head(ratio104b,10),
+               head(ratio105b,10),head(ratio106b,10))
+knitr::kable(compare1)
 ```
+
 故女生薪資很少大於男生,103年還沒有任何職業符合的資料,是真的男女同工不同酬
 
 ## 研究所薪資差異
@@ -131,7 +141,7 @@ head(ratio106b$大職業別,10)
 以106年度的資料來看，哪個職業別念研究所最划算呢 (研究所學歷薪資與大學學歷薪資增加比例最多)?
  
 ```{r grad}
-ddd106<-aaa106[,c(-2,-3)]
+ddd106<-aaa106
 ddd106$研究大學比<-as.numeric(ddd106$`研究所及以上-薪資`)/as.numeric(ddd106$`大學-薪資`)
 ddd106<-arrange(ddd106,desc(研究大學比))
 head(ddd106$大職業別)
@@ -146,14 +156,14 @@ head(ddd106$大職業別)
 ### 有興趣的職業別篩選，呈現薪資
 ```{r like}
 eee106<-aaa106
-eee106[eee106$大職業別=="資訊及通訊傳播業",c(1,4,6)]
+knitr::kable(eee106[eee106$大職業別=="資訊及通訊傳播業",c(2,3,5)])
 ```
 
 ### 這些職業別研究所薪資與大學薪資差多少呢？
 資訊及通訊傳播業
 ```{r likeGrad}
-pro<-as.numeric(eee106[eee106$大職業別=="資訊及通訊傳播業",6])
-univisity<-as.numeric(eee106[eee106$大職業別=="資訊及通訊傳播業",4])
+pro<-as.numeric(eee106[eee106$大職業別=="資訊及通訊傳播業",5])
+univisity<-as.numeric(eee106[eee106$大職業別=="資訊及通訊傳播業",3])
 pro-univisity
 ```
 研究所薪資比我想像中多很多,不過我還是不想念研究所,我怕我又耍廢,不如直接找工作
